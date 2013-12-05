@@ -1,0 +1,1 @@
+(ns commit-formatter.core)
