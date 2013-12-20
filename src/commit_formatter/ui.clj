@@ -1,5 +1,5 @@
 (ns ui
-  (:use [clojure.string :only (split)]))
+  (:use [clojure.string :only (split join)]))
 
 (defn create-frame [title size-x size-y]
   (doto(new javax.swing.JFrame)
