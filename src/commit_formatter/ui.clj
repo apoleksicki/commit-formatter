@@ -13,15 +13,14 @@
     (.setSize size-x size-y)
     (.setTitle title)))
 
-(defn update-text-area [text-area]
+(defn format-and-copy-message [header-field text-area]
   (let [formatted-message (format-message (.getText text-area))] 
     (.setText text-area formatted-message)
-    (set-text! formatted-message)))
-
-(def header (new javax.swing.JTextField 52))
+    (set-text! (format "%s\n%s" (.getText header-field) formatted-message))))
 
 (defn create-main-frame []
-  (let [message-area (new javax.swing.JTextArea)]
+  (let [message-area (new javax.swing.JTextArea)
+        header (new javax.swing.JTextField 52)]
   (doto (create-frame "Commit formatter" 640 480)
     (.add
       (doto (new javax.swing.JPanel (new java.awt.BorderLayout) true)
@@ -29,10 +28,8 @@
         (.add  message-area
               (. java.awt.BorderLayout CENTER))
         (.add (doto (new javax.swing.JButton "Format & copy")
-                (on-action event (update-text-area message-area)))
+                (on-action event (format-and-copy-message header message-area)))
               (. java.awt.BorderLayout SOUTH)))))))
-
-
 
 (defn new-main-frame []
   (let [frame (create-main-frame)]
