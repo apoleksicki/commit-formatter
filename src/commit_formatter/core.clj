@@ -7,11 +7,11 @@
 
 (def expected-test-line "Ta linia jest zbyt długa i nie pasuje do uzgodnionego format. Dlatego\nteż, należy ją podzielić na dwie.")
 
-(defn add-word [s1 s2]
-  (let []))
+(def test-url "https://www.google.dk/search?q=take+clojure&oq=take+clojure&aqs=chrome..69i57j0l5.1546j0j7&sourceid=chrome&espv=210&es_sm=93&ie=UTF-8#es_sm=93&espv=210&q=long+url")
 
 (defn calculate-next-end-of-line [line]
-  (if (< (.length line) line-length)
+  (if (or (< (.length line) line-length) 
+          (not (.contains line " ")))
     (- (.length line) 1)
     (.lastIndexOf (subs line 0 line-length) " ")))
 
@@ -39,5 +39,6 @@
 
 (defn test-format []
   (is (= expected-test-line (format-message test-line)))
-  (is (= expected-test-line (format-message expected-test-line))))
+  (is (= expected-test-line (format-message expected-test-line)))
+  (is (= test-url (format-message test-url))))
   
