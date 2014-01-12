@@ -13,25 +13,23 @@
     (- (.length line) 1)
     (.lastIndexOf (subs line 0 line-length) " ")))
 
+(defn next-to-format [eol to-format] 
+  (subs to-format 
+        (+ eol 1) 
+        (.length to-format)))
+
 (defn format-message [message]
   (defn format-intern [formatted to-format]
     (if (blank? to-format)
       formatted
       (let [eol (calculate-next-end-of-line to-format)]
-        (print-message (list "to format: " to-format))
-        (let [new-to-format (next-to-format eol to-format)]           
+                (let [new-to-format (next-to-format eol to-format)]           
           (format-intern (conj formatted (subs to-format 0 
                                                (if (blank? new-to-format) 
                                                  (+ eol 1) 
                                                  eol))) 
-                         foo)))))
+                         new-to-format)))))
   (join "\n" (reverse (format-intern () message))))
-
-
-(defn next-to-format [eol to-format] 
-  (subs to-format 
-        (+ eol 1) 
-        (.length to-format)))
 
 (defn print-message [messages] 
   (println (join " " messages)))
