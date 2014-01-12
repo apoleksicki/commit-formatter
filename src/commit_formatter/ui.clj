@@ -1,6 +1,7 @@
 (ns ui
   (:use [clojure.string :only (split join)]
-        [commit-formatter.core :only (format-message)]))
+        [commit-formatter.core :only (format-message)]
+        [snipsnap.core]))
 
 (defmacro on-action [component event & body]
   `(. ~component addActionListener
@@ -13,8 +14,9 @@
     (.setTitle title)))
 
 (defn update-text-area [text-area]
-  (format "text: %s" (.getText text-area)) 
-  (.setText text-area (format-message (.getText text-area))))
+  (let [formatted-message (format-message (.getText text-area))] 
+    (.setText text-area formatted-message)
+    (set-text! formatted-message)))
 
 (def header (new javax.swing.JTextField 52))
 
