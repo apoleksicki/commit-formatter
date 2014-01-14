@@ -21,18 +21,17 @@
         (.length to-format)))
 
 (defn format-message [message]
-  (defn format-intern [formatted to-format]
-    (format "to-format: %s" to-format)
-    (if (blank? to-format)
-      formatted
-      (let [eol (calculate-next-end-of-line to-format)]
-                (let [new-to-format (next-to-format eol to-format)]           
-          (format-intern (conj formatted (subs to-format 0 
-                                               (if (blank? new-to-format) 
-                                                 (+ eol 1) 
-                                                 eol))) 
-                         new-to-format)))))
-  (join "\n"(map (fn [line] (join "\n" (reverse (format-intern () line)))) (split message #"\n"))))
+  (letfn [(format-intern [formatted to-format]
+                         (if (blank? to-format)
+                           formatted
+                           (let [eol (calculate-next-end-of-line to-format)]
+                             (let [new-to-format (next-to-format eol to-format)]           
+                               (format-intern (conj formatted (subs to-format 0 
+                                                                    (if (blank? new-to-format) 
+                                                                      (+ eol 1) 
+                                                                      eol))) 
+                                              new-to-format)))))]
+    (join "\n"(map (fn [line] (join "\n" (reverse (format-intern () line)))) (split message #"\n")))))
 
 (defn print-message [messages] 
   (println (join " " messages)))
