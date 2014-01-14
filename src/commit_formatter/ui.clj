@@ -16,7 +16,7 @@
 (defn format-and-copy-message [header-field text-area]
   (let [formatted-message (format-message (.getText text-area))] 
     (.setText text-area formatted-message)
-    (set-text! (format "%s\n%s" (.getText header-field) formatted-message))))
+    (set-text! (format "%s\n\n%s" (.getText header-field) formatted-message))))
 
 (defn create-main-frame []
   (let [message-area (new javax.swing.JTextArea)
