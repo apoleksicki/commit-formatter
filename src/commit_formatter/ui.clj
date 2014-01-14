@@ -1,4 +1,4 @@
-(ns ui
+(ns commit-formatter.ui
   (:use [clojure.string :only (split join)]
         [commit-formatter.core :only (format-message)]
         [snipsnap.core]))
