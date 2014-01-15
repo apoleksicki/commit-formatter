@@ -3,7 +3,7 @@
 
 (def line-length 72)
 
-(def header-length 50)
+(def header-length 52)
 
 (defn get-next-chunk [line]
   (if (or (< (.length line) line-length) 
