@@ -3,6 +3,8 @@
 
 (def line-length 72)
 
+(def header-length 50)
+
 (defn get-next-chunk [line]
   (if (or (< (.length line) line-length) 
           (not (.contains line " ")))

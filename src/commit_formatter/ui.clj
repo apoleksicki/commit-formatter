@@ -1,6 +1,6 @@
 (ns commit-formatter.ui
   (:use [clojure.string :only (split join)]
-        [commit-formatter.core :only (format-message)]
+        [commit-formatter.core :only (format-message header-length)]
         [snipsnap.core])
   (:gen-class))
 
@@ -14,6 +14,16 @@
     (.setSize size-x size-y)
     (.setTitle title)))
 
+(defn create-header []
+  (println "create-header")
+  (doto (new javax.swing.JTextField header-length)
+    (.setDocument (proxy [javax.swing.text.PlainDocument] []
+                    (insertString [offset str attr]
+                      (when  (and 
+                               (not (nil? str))
+                               (<= (+ (.getLength this) (.length str)) header-length))
+                        (proxy-super insertString offset str attr)))))))
+  
 (defn format-and-copy-message [header-field text-area]
   (let [formatted-message (format-message (.getText text-area))] 
     (.setText text-area formatted-message)
@@ -21,7 +31,7 @@
 
 (defn create-main-frame []
   (let [message-area (new javax.swing.JTextArea)
-        header (new javax.swing.JTextField 52)]
+        header (create-header)]
   (doto (create-frame "Commit formatter" 640 480)
     (.add
       (doto (new javax.swing.JPanel (new java.awt.BorderLayout) true)
@@ -31,6 +41,7 @@
         (.add (doto (new javax.swing.JButton "Format & copy")
                 (on-action event (format-and-copy-message header message-area)))
               (. java.awt.BorderLayout SOUTH)))))))
+
 
 (defn new-main-frame []
   (let [frame (create-main-frame)]
