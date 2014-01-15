@@ -1,4 +1,4 @@
-(defproject commit-formatter "0.0.1"
+(defproject commit-formatter "0.0.2-SNAPSHOT"
   :description "FIXME: write"
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [snipsnap "0.1.0"]
