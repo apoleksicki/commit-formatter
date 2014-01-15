@@ -3,7 +3,7 @@
 
 (def line-length 72)
 
-(defn calculate-next-end-of-line [line]
+(defn get-next-chunk [line]
   (if (or (< (.length line) line-length) 
           (not (.contains line " ")))
     (- (.length line) 1)
@@ -18,7 +18,7 @@
   (letfn [(format-intern [formatted to-format]
                          (if (blank? to-format)
                            formatted
-                           (let [eol (calculate-next-end-of-line to-format)]
+                           (let [eol (get-next-chunk to-format)]
                              (let [new-to-format (next-to-format eol to-format)]           
                                (format-intern (conj formatted (subs to-format 0 
                                                                     (if (blank? new-to-format) 

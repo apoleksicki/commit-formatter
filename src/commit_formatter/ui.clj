@@ -1,7 +1,8 @@
 (ns commit-formatter.ui
   (:use [clojure.string :only (split join)]
         [commit-formatter.core :only (format-message)]
-        [snipsnap.core]))
+        [snipsnap.core])
+  (:gen-class))
 
 (defmacro on-action [component event & body]
   `(. ~component addActionListener
@@ -34,3 +35,6 @@
 (defn new-main-frame []
   (let [frame (create-main-frame)]
     (.setVisible frame true)))
+
+(defn -main [& args]
+  (new-main-frame))
