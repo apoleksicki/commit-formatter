@@ -15,7 +15,6 @@
     (.setTitle title)))
 
 (defn create-header []
-  (println "create-header")
   (doto (new javax.swing.JTextField header-length)
     (.setDocument (proxy [javax.swing.text.PlainDocument] []
                     (insertString [offset str attr]
@@ -25,9 +24,9 @@
                         (proxy-super insertString offset str attr)))))))
   
 (defn format-and-copy-message [header-field text-area]
-  (let [formatted-message (format-message (.getText text-area))] 
-    (.setText text-area formatted-message)
-    (set-text! (format "%s\n\n%s" (.getText header-field) formatted-message))))
+  (fn [] (let [formatted-message (format-message (.getText text-area))] 
+           (.setText text-area formatted-message)
+           (set-text! (format "%s\n\n%s" (.getText header-field) formatted-message)))))
 
 (defn create-main-frame []
   (let [message-area (new javax.swing.JTextArea)
@@ -38,10 +37,13 @@
         (.add header (. java.awt.BorderLayout NORTH))
         (.add  message-area
               (. java.awt.BorderLayout CENTER))
-        (.add (doto (new javax.swing.JButton "Format & copy")
-                (on-action event (format-and-copy-message header message-area)))
+        (.add (create-buttons-panel (format-and-copy-message header message-area))
               (. java.awt.BorderLayout SOUTH)))))))
 
+(defn create-buttons-panel [format-function]
+  (doto (new javax.swing.JPanel (new java.awt.BorderLayout) true)
+    (.add (doto (new javax.swing.JButton "Format & copy")
+            (on-action event (format-function))))))
 
 (defn new-main-frame []
   (let [frame (create-main-frame)]
