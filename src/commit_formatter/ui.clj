@@ -30,10 +30,17 @@
 
 (defn clear-message [frame header-field text-area]
   (fn []
-    (when (= 1 (javax.swing.JOptionPane/showConfirmDialog 
+    (when (= 0 (javax.swing.JOptionPane/showConfirmDialog 
                  frame "Are you sure?" "Clear text" javax.swing.JOptionPane/YES_NO_OPTION))
       (.setText header-field "")
       (.setText text-area ""))))
+
+(defn create-buttons-panel [format-function clear-function]
+  (doto (new javax.swing.JPanel (new java.awt.FlowLayout) true)
+    (.add (doto (new javax.swing.JButton "Format & copy")
+            (on-action event (format-function))))
+    (.add (doto (new javax.swing.JButton "Clear")
+            (on-action event (clear-function))))))
 
 (defn create-main-frame []
   (let [message-area (new javax.swing.JTextArea)
@@ -49,13 +56,6 @@
                 (format-and-copy-message header message-area)
                 (clear-message frame header message-area))
               (. java.awt.BorderLayout SOUTH)))))))
-
-(defn create-buttons-panel [format-function clear-function]
-  (doto (new javax.swing.JPanel (new java.awt.FlowLayout) true)
-    (.add (doto (new javax.swing.JButton "Format & copy")
-            (on-action event (format-function))))
-    (.add (doto (new javax.swing.JButton "Clear")
-            (on-action event (clear-function))))))
 
 (defn new-main-frame []
   (let [frame (create-main-frame)]
