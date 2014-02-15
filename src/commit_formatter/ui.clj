@@ -43,14 +43,14 @@
             (on-action event (clear-function))))))
 
 (defn create-main-frame []
-  (let [message-area (new javax.swing.JTextArea)
-        header (create-header)
-        frame (create-frame "Commit formatter" 640 480)]
+  (let [frame (create-frame "Commit formatter" 640 480)
+        message-area (new javax.swing.JTextArea)
+        header (create-header)]
   (doto frame
     (.add
       (doto (new javax.swing.JPanel (new java.awt.BorderLayout) true)
         (.add header (. java.awt.BorderLayout NORTH))
-        (.add  message-area
+        (.add  (new javax.swing.JScrollPane message-area)
               (. java.awt.BorderLayout CENTER))
         (.add (create-buttons-panel 
                 (format-and-copy-message header message-area)
