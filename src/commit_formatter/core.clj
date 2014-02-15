@@ -7,8 +7,10 @@
 
 (defn get-next-chunk [line]
   (if (or (< (.length line) line-length) 
-          (not (.contains line " ")))
-    (- (.length line) 1)
+          (not (.contains (subs line 0 line-length) " ")))
+    (if (and  (> (.length line) line-length) (.contains line " "))
+      (.indexOf line " ")
+      (- (.length line) 1))
     (.lastIndexOf (subs line 0 line-length) " ")))
 
 (defn next-to-format [eol to-format] 
@@ -21,7 +23,8 @@
                          (if (blank? to-format)
                            formatted
                            (let [eol (get-next-chunk to-format)]
-                             (let [new-to-format (next-to-format eol to-format)]           
+                             (let [new-to-format (next-to-format eol to-format)]
+                               ;(println new-to-format)           
                                (format-intern (conj formatted (subs to-format 0 
                                                                     (if (blank? new-to-format) 
                                                                       (+ eol 1) 
