@@ -1,8 +1,8 @@
 (defproject commit-formatter "0.0.2-SNAPSHOT"
   :description "FIXME: write"
-  :dependencies [[org.clojure/clojure "1.3.0"]
+  :dependencies [[org.clojure/clojure "1.5.1"]
                  [snipsnap "0.1.0"]
-                 [org.clojure/math.combinatorics "0.0.3"]]
+                 [org.clojure/core.match "0.2.1"]]
   :plugins [[lein2-eclipse "2.0.0"]]
   :aot [commit-formatter.ui]
   :main commit-formatter.ui
