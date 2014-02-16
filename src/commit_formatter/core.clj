@@ -6,35 +6,15 @@
 
 (def header-length 52)
 
-(defn find-chunk-end [line]
-  (if ))
-
 (defn get-next-chunk [line]
-  (println line)
   (let [shorter-than-max (< (.length line) line-length)
         no-spaces-in-chunk (not (.contains (if shorter-than-max line (subs line 0 line-length)) " "))
         spaces-in-line (.contains line " ")] 
-    (match [shorter-than-max no-spaces spaces-in-line]
-           [true _ _] (do 
-                      (println "1")
-                      (- (.length line) 1))
+    (match [shorter-than-max no-spaces-in-chunk spaces-in-line]
+           [true _ _] (- (.length line) 1)
            [false true true] (.indexOf line " ")
-           [false true false] (do
-                          (println "2")
-                          (- (.length line) 1) )
-;           [false false _] (do 
-;                          (println "3")
-;                          (.indexOf line " "))
-           :else (.lastIndexOf (subs line 0 line-length) " ")))
-  
-  
-;  (if (or (< (.length line) line-length) 
-;          (not (.contains (subs line 0 line-length) " ")))
-;    (if (and  (> (.length line) line-length) (.contains line " "))
-;      (.indexOf line " ")
-;      (- (.length line) 1))
-;    (.lastIndexOf (subs line 0 line-length) " "))
-  )
+           [false true false] (- (.length line) 1) 
+           :else (.lastIndexOf (subs line 0 line-length) " "))))
 
 (defn next-to-format [eol to-format] 
   (subs to-format 
