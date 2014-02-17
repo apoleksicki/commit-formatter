@@ -3,8 +3,11 @@
         [commit-formatter.core :only (format-message header-length)]
         [snipsnap.core])
   (:import (javax.swing JPanel)
-           (javax.swing JLabel))
+           (javax.swing JLabel)
+           (javax.swing JOptionPane))
   (:gen-class))
+
+(def header-message-separator "\n\n")
 
 (defmacro on-action [component event & body]
   `(. ~component addActionListener
@@ -28,17 +31,33 @@
 (defn format-and-copy-message [header-field text-area]
   (fn [] (let [formatted-message (format-message (.getText text-area))] 
            (.setText text-area formatted-message)
-           (set-text! (format "%s\n\n%s" (.getText header-field) formatted-message)))))
+           (set-text! (format "%s%s%s" (.getText header-field) header-message-separator formatted-message)))))
 
 (defn clear-message [frame header-field text-area]
   (fn []
-    (when (= 0 (javax.swing.JOptionPane/showConfirmDialog 
-                 frame "Are you sure?" "Clear text" javax.swing.JOptionPane/YES_NO_OPTION))
+    (when (= 0 (JOptionPane/showConfirmDialog 
+                 frame "Are you sure?" "Clear text" JOptionPane/YES_NO_OPTION))
       (.setText header-field "")
       (.setText text-area ""))))
 
-(defn create-buttons-panel [format-function clear-function]
+
+(defn paste-message [frame header-field text-area]
+  (fn []
+    (let [to-paste (get-text) index (.indexOf to-paste header-message-separator)]
+      (if (and (not (= index -1))
+               (<= index header-length))
+        (do
+          (.setText header-field (subs to-paste 0 index))
+          (.setText text-area (subs to-paste (+ index 2))))
+        (JOptionPane/showConfirmDialog 
+          frame 
+          (format "Header must not be empty and cannot be longer than %d characters" header-length) 
+          "Format error" JOptionPane/ERROR_MESSAGE)))))
+
+(defn create-buttons-panel [paste-function format-function clear-function]
   (doto (new JPanel (new java.awt.FlowLayout) true)
+    (.add (doto (new javax.swing.JButton "Paste")
+            (on-action event (paste-function))))
     (.add (doto (new javax.swing.JButton "Format & copy")
             (on-action event (format-function))))
     (.add (doto (new javax.swing.JButton "Clear")
@@ -66,6 +85,7 @@
         (.add (create-message-panel message-area)
               (. java.awt.BorderLayout CENTER))
         (.add (create-buttons-panel 
+                (paste-message frame header message-area)
                 (format-and-copy-message header message-area)
                 (clear-message frame header message-area))
               (. java.awt.BorderLayout SOUTH)))))))
