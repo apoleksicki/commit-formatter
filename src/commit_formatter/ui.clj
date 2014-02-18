@@ -48,7 +48,7 @@
           (do
             (.setText header-field header))
           (.setText text-area message))
-        (JOptionPane/showConfirmDialog 
+        (JOptionPane/showMessageDialog 
           frame 
           (format "Header must not be empty and cannot be longer than %d characters" header-length) 
           "Format error" JOptionPane/ERROR_MESSAGE)))))
