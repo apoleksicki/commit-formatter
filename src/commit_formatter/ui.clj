@@ -4,7 +4,9 @@
         [snipsnap.core])
   (:import (javax.swing JPanel)
            (javax.swing JLabel)
-           (javax.swing JOptionPane))
+           (javax.swing JOptionPane)
+           (javax.swing JFrame)
+           (java.awt.event WindowAdapter))
   (:gen-class))
 
 (defmacro on-action [component event & body]
@@ -13,9 +15,10 @@
         (actionPerformed [~event] ~@body))))
 
 (defn create-frame [title size-x size-y]
-  (doto(new javax.swing.JFrame)
-    (.setSize size-x size-y)
-    (.setTitle title)))
+  (doto(new JFrame)
+            (.setSize size-x size-y)
+            (.setTitle title)
+            (.setDefaultCloseOperation JFrame/DO_NOTHING_ON_CLOSE)))
 
 (defn create-header []
   (doto (new javax.swing.JTextField header-length)
@@ -77,17 +80,22 @@
   (let [frame (create-frame "Commit formatter" 640 480)
         message-area (new javax.swing.JTextArea 30 50)
         header (create-header)]
-  (doto frame
-    (.add
-      (doto (new JPanel (new java.awt.BorderLayout) true)
-        (.add (create-header-panel header) (. java.awt.BorderLayout NORTH))
-        (.add (create-message-panel message-area)
-              (. java.awt.BorderLayout CENTER))
-        (.add (create-buttons-panel 
-                (paste-message frame header message-area)
-                (format-and-copy-message header message-area)
-                (clear-message frame header message-area))
-              (. java.awt.BorderLayout SOUTH)))))))
+    (doto frame
+      (.add
+        (doto (new JPanel (new java.awt.BorderLayout) true)
+          (.add (create-header-panel header) (. java.awt.BorderLayout NORTH))
+          (.add (create-message-panel message-area)
+                (. java.awt.BorderLayout CENTER))
+          (.add (create-buttons-panel 
+                  (paste-message frame header message-area)
+                  (format-and-copy-message header message-area)
+                  (clear-message frame header message-area))
+                (. java.awt.BorderLayout SOUTH))))
+      (.addWindowListener (proxy [WindowAdapter] []
+                            (windowClosing [windowEvent]
+                                           (when (= 0 (JOptionPane/showConfirmDialog 
+                                                        frame "Are you sure?" "Close window" JOptionPane/YES_NO_OPTION))
+                                             (java.lang.System/exit 0))))))))
 
 (defn new-main-frame []
   (let [frame (create-main-frame)]
