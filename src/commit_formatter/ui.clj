@@ -1,13 +1,11 @@
 (ns commit-formatter.ui
   (:use [clojure.string :only (split join)]
-        [commit-formatter.core :only (format-message header-length)]
+        [commit-formatter.core]
         [snipsnap.core])
   (:import (javax.swing JPanel)
            (javax.swing JLabel)
            (javax.swing JOptionPane))
   (:gen-class))
-
-(def header-message-separator "\n\n")
 
 (defmacro on-action [component event & body]
   `(. ~component addActionListener
@@ -43,12 +41,13 @@
 
 (defn paste-message [frame header-field text-area]
   (fn []
-    (let [to-paste (get-text) index (.indexOf to-paste header-message-separator)]
-      (if (and (not (= index -1))
-               (<= index header-length))
-        (do
-          (.setText header-field (subs to-paste 0 index))
-          (.setText text-area (subs to-paste (+ index 2))))
+    (let [to-paste (get-text)]
+      
+      (if (validate-message to-paste)
+        (let [{header :header message :message} (convert-message to-paste)]
+          (do
+            (.setText header-field header))
+          (.setText text-area message))
         (JOptionPane/showConfirmDialog 
           frame 
           (format "Header must not be empty and cannot be longer than %d characters" header-length) 

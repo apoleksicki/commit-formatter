@@ -6,6 +6,20 @@
 
 (def header-length 52)
 
+(def header-message-separator "\n\n")
+
+(defn calculate-separator-index [message]
+  (.indexOf message header-message-separator))
+
+(defn validate-message [message]
+  (let [index (calculate-separator-index message)]
+    (and (not (= index -1))
+         (<= index header-length))))
+
+(defn convert-message [message]
+  (let [index (calculate-separator-index message)]
+        {:header (subs message 0 index) :message (subs message (+ index 2))}))
+
 (defn get-next-chunk [line]
   (let [shorter-than-max (< (.length line) line-length)
         no-spaces-in-chunk (not (.contains (if shorter-than-max line (subs line 0 line-length)) " "))
@@ -27,16 +41,13 @@
                            formatted
                            (let [eol (get-next-chunk to-format)]
                              (let [new-to-format (next-to-format eol to-format)]
-                               ;(println new-to-format)           
-                               (format-intern (conj formatted (subs to-format 0 
-                                                                    (if (blank? new-to-format) 
-                                                                      (+ eol 1) 
-                                                                      eol))) 
+                               (format-intern (conj formatted 
+                                                    (subs to-format 0 
+                                                          (if (blank? new-to-format) 
+                                                            (+ eol 1) 
+                                                            eol))) 
                                               new-to-format)))))]
     (join "\n"(map (fn [line] (join "\n" (reverse (format-intern () line)))) (split message #"\n")))))
 
 (defn print-message [messages] 
-  (println (join " " messages)))
-
-
-  
+  (println (join " " messages)))  
