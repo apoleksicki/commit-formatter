@@ -16,12 +16,6 @@
       (proxy [java.awt.event.ActionListener] []
         (actionPerformed [~event] ~@body))))
 
-(defn create-frame [title size-x size-y]
-  (doto(new JFrame)
-            (.setSize size-x size-y)
-            (.setTitle title)
-            (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)))
-
 (defn create-header []
   (doto (new javax.swing.JTextField header-length)
     (.setDocument (proxy [javax.swing.text.PlainDocument] []
@@ -81,7 +75,7 @@
 
 
 (defn create-main-frame []
-  (let [frame (create-frame "Commit formatter" 640 480)
+  (let [frame (frame :title "Commit formatter" :on-close :dispose)
         message-area (new javax.swing.JTextArea 30 50)
         header (create-header)]
     (doto frame
@@ -103,9 +97,9 @@
       )))
 
 (defn new-main-frame []
-  (let [frame (create-main-frame)]
-    (.pack frame)
-    (.setVisible frame true)))
+  (-> (create-main-frame)
+    pack!
+    show!))
 
 (defn -main [& args]
   (new-main-frame))
