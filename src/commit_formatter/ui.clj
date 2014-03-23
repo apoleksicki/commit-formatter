@@ -17,7 +17,7 @@
         (actionPerformed [~event] ~@body))))
 
 (defn create-header []
-  (doto (new javax.swing.JTextField header-length)
+  (doto (text :multi-line? false :columns header-length)
     (.setDocument (proxy [javax.swing.text.PlainDocument] []
                     (insertString [offset str attr]
                       (when  (and 
@@ -27,15 +27,15 @@
   
 (defn format-and-copy-message [header-field text-area]
   (fn [e] (let [formatted-message (format-message (.getText text-area))] 
-           (.setText text-area formatted-message)
+           (text! text-area formatted-message)
            (set-text! (format "%s%s%s" (.getText header-field) header-message-separator formatted-message)))))
 
 (defn clear-message [frame header-field text-area]
   (fn [e]
     (when (= 0 (JOptionPane/showConfirmDialog 
                  frame "Are you sure?" "Clear text" JOptionPane/YES_NO_OPTION))
-      (.setText header-field "")
-      (.setText text-area ""))))
+      (text! header-field "")
+      (text! text-area ""))))
 
 
 (defn paste-message [frame header-field text-area]
@@ -45,8 +45,8 @@
       (if (validate-message to-paste)
         (let [{header :header message :message} (convert-message to-paste)]
           (do
-            (.setText header-field header))
-          (.setText text-area message))
+            (text! header-field header))
+          (text! text-area message))
         (JOptionPane/showMessageDialog 
           frame 
           (format "Header must not be empty and cannot be longer than %d characters" header-length) 
@@ -71,12 +71,15 @@
 (defn create-message-panel [message-area]
   (doto (new JPanel)
     (.add (label "Message:"))
-    (.add (new javax.swing.JScrollPane message-area))))
+    (.add (scrollable message-area))))
 
+
+(defn create-message-area []
+ (text :multi-line? true :wrap-lines? true :rows 30 :columns line-length))
 
 (defn create-main-frame []
   (let [frame (frame :title "Commit formatter" :on-close :dispose)
-        message-area (new javax.swing.JTextArea 30 50)
+        message-area (create-message-area)
         header (create-header)]
     (doto frame
       (.add
@@ -88,13 +91,7 @@
                   (paste-message frame header message-area)
                   (format-and-copy-message header message-area)
                   (clear-message frame header message-area))
-                (. java.awt.BorderLayout SOUTH))))
-;      (.addWindowListener (proxy [WindowAdapter] []
-;                            (windowClosing [windowEvent]
-;                                           (when (= 0 (JOptionPane/showConfirmDialog 
-;                                                        frame "Are you sure?" "Close window" JOptionPane/YES_NO_OPTION))
-;                                             (java.lang.System/exit 0)))))
-      )))
+                (. java.awt.BorderLayout SOUTH)))))))
 
 (defn new-main-frame []
   (-> (create-main-frame)
