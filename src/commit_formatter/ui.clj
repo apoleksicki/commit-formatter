@@ -4,17 +4,8 @@
         [commit-formatter.core]
         [snipsnap.core]
         [seesaw.core])
-  (:import (javax.swing JPanel)
-           (javax.swing JLabel)
-           (javax.swing JOptionPane)
-           (javax.swing JFrame)
-           (java.awt.event WindowAdapter))
+  (:import (javax.swing JOptionPane))
   (:gen-class))
-
-(defmacro on-action [component event & body]
-  `(. ~component addActionListener
-      (proxy [java.awt.event.ActionListener] []
-        (actionPerformed [~event] ~@body))))
 
 (defn create-header []
   (doto (text :multi-line? false :columns header-length)
@@ -64,33 +55,30 @@
              (create-button "Clear" clear-function))))
 
 (defn create-header-panel [header]
-  (doto (new JPanel)
-    (.add (label "Header:"))
-    (.add header)))
+  (flow-panel 
+    :items (list (label "Header:") header)))
 
 (defn create-message-panel [message-area]
-  (doto (new JPanel)
-    (.add (label "Message:"))
-    (.add (scrollable message-area))))
+  (flow-panel
+    :items (list(label "Message:") (scrollable message-area))))
 
 
 (defn create-message-area []
  (text :multi-line? true :wrap-lines? true :rows 30 :columns line-length))
 
 (defn create-main-frame []
-  (let [frame (frame :title "Commit formatter" :on-close :dispose)
-        message-area (create-message-area)
+  (let [message-area (create-message-area)
         header (create-header)]
-    (doto frame
-      (.add
-        (border-panel
-          :north (create-header-panel header) 
-          :center (create-message-panel message-area)
-          :south      
-          (create-buttons-panel 
-            (paste-message frame header message-area)
-            (format-and-copy-message header message-area)
-            (clear-message frame header message-area)))))))
+    (frame :title "Commit formatter" 
+           :on-close :dispose
+           :content (border-panel
+                      :north (create-header-panel header) 
+                      :center (create-message-panel message-area)
+                      :south      
+                      (create-buttons-panel 
+                        (paste-message frame header message-area)
+                        (format-and-copy-message header message-area)
+                        (clear-message frame header message-area))))))
 
 (defn new-main-frame []
   (-> (create-main-frame)
