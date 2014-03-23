@@ -83,15 +83,14 @@
         header (create-header)]
     (doto frame
       (.add
-        (doto (new JPanel (new java.awt.BorderLayout) true)
-          (.add (create-header-panel header) (. java.awt.BorderLayout NORTH))
-          (.add (create-message-panel message-area)
-                (. java.awt.BorderLayout CENTER))
-          (.add (create-buttons-panel 
-                  (paste-message frame header message-area)
-                  (format-and-copy-message header message-area)
-                  (clear-message frame header message-area))
-                (. java.awt.BorderLayout SOUTH)))))))
+        (border-panel
+          :north (create-header-panel header) 
+          :center (create-message-panel message-area)
+          :south      
+          (create-buttons-panel 
+            (paste-message frame header message-area)
+            (format-and-copy-message header message-area)
+            (clear-message frame header message-area)))))))
 
 (defn new-main-frame []
   (-> (create-main-frame)
