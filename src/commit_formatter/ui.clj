@@ -3,12 +3,13 @@
         [clojure.repl]
         [commit-formatter.core]
         [snipsnap.core]
-        [seesaw.core])
+        [seesaw.core]
+        [seesaw.mig])
   (:import (javax.swing JOptionPane))
   (:gen-class))
 
 (defn create-header []
-  (doto (text :multi-line? false :columns header-length)
+  (doto (text :multi-line? false :columns line-length)
     (.setDocument (proxy [javax.swing.text.PlainDocument] []
                     (insertString [offset str attr]
                       (when  (and 
@@ -24,7 +25,7 @@
 (defn clear-message [frame header-field text-area]
   (fn [e]
     (when (= 0 (JOptionPane/showConfirmDialog 
-                 frame "Are you sure?" "Clear text" JOptionPane/YES_NO_OPTION))
+                 text-area "Are you sure?" "Clear text" JOptionPane/YES_NO_OPTION))
       (text! header-field "")
       (text! text-area ""))))
 
@@ -54,15 +55,6 @@
              (create-button "Format & copy" format-function)
              (create-button "Clear" clear-function))))
 
-(defn create-header-panel [header]
-  (flow-panel 
-    :items (list (label "Header:") header)))
-
-(defn create-message-panel [message-area]
-  (flow-panel
-    :items (list(label "Message:") (scrollable message-area))))
-
-
 (defn create-message-area []
  (text :multi-line? true :wrap-lines? true :rows 30 :columns line-length))
 
@@ -71,14 +63,16 @@
         header (create-header)]
     (frame :title "Commit formatter" 
            :on-close :dispose
-           :content (border-panel
-                      :north (create-header-panel header) 
-                      :center (create-message-panel message-area)
-                      :south      
-                      (create-buttons-panel 
-                        (paste-message frame header message-area)
-                        (format-and-copy-message header message-area)
-                        (clear-message frame header message-area))))))
+           :content (mig-panel 
+                      :constraints ["" "center" "center"]
+                      :items [[(label "Header:")]
+                              [header "wrap, left"]
+                              [(label "Message:")]
+                              [(scrollable message-area) "wrap"] 
+                              [(create-buttons-panel 
+                                 (paste-message frame header message-area)
+                                 (format-and-copy-message header message-area)
+                                 (clear-message frame header message-area)) "span"]]))))
 
 (defn new-main-frame []
   (-> (create-main-frame)
