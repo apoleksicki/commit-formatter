@@ -4,7 +4,8 @@
         [commit-formatter.core]
         [snipsnap.core]
         [seesaw.core]
-        [seesaw.mig])
+        [seesaw.mig]
+        [seesaw.util :only (to-mnemonic-keycode)])
   (:import (javax.swing JOptionPane))
   (:gen-class))
 
@@ -44,15 +45,17 @@
           (format "Header must not be empty and cannot be longer than %d characters" header-length) 
           "Format error" JOptionPane/ERROR_MESSAGE)))))
 
-(defn create-button [text function]
-  (doto (button :text text)
+(defn create-button [text function & {:keys [mnemonic] :or {mnemonic nil}}]
+  (doto (if mnemonic 
+          (button :text text :mnemonic mnemonic)
+          (button :text text))
     (listen :action function)))
 
 (defn create-buttons-panel [paste-function format-function clear-function]
   (flow-panel 
     :items (list 
              (create-button "Paste" paste-function)
-             (create-button "Format & copy" format-function)
+             (create-button "Format & copy" format-function :mnemonic (to-mnemonic-keycode "F"))
              (create-button "Clear" clear-function))))
 
 (defn create-message-area []
